@@ -12,6 +12,7 @@ import SceneComponent from "babylonjs-hook"
 import { Box, Dieline, DielinePart } from "../types"
 import "./scene3D.scss"
 import BoxGenerator from "../services/box-generator"
+const earcut = require("earcut")
 
 interface Scene3DProps {
   dieline: Dieline
@@ -59,10 +60,12 @@ const Scene3D = (props: PropsWithChildren<Scene3DProps>) => {
         ]
       }).flat()
 
-      let indices: number[] = []
+      let indices = earcut(positions, [], 3)
 
-      for (let i = 0; i < vertices.length - 2; i ++) {
-        indices = [...indices, 0, i + 1, i + 2]
+      if (indices.length === 0) {
+        for (let i = 0; i < vertices.length - 2; i ++) {
+          indices = [...indices, 0, i + 1, i + 2]
+        }
       }
 
       const vertexData = new VertexData()

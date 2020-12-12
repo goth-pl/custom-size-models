@@ -16,6 +16,10 @@ export const box: Dieline = {
     { id: 'L', x: 20, y: -30 },
     { id: 'M', x: 10, y: -40 },
     { id: 'N', x: 20, y: -40 },
+    { id: 'O', x: 10.5, y: -40.5 },
+    { id: 'P', x: 19.5, y: -40.5 },
+    { id: 'R', x: 12.5, y: -41 },
+    { id: 'S', x: 17.5, y: -41 },
   ],
   parts: [
     {
@@ -46,6 +50,11 @@ export const box: Dieline = {
       id: 'TOP',
       edges: [['K', 'L'], ['L', 'N'], ['M', 'N'], ['K', 'M']],
       rotation: { angle: 45, edge: ['K', 'L'] }
+    },
+    {
+      id: 'TOP2',
+      edges: [['M', 'N'], ['N', 'P'], ['P', 'S'], ['R', 'S'], ['O', 'R'], ['M', 'O']],
+      rotation: { angle: 90, edge: ['M', 'N'] }
     },
   ]
 }
