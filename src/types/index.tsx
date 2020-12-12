@@ -19,7 +19,7 @@ export interface Rotation {
 export interface DielinePart {
   id: string
   edges: string[][]
-  rotations?: Rotation[]
+  rotation?: Rotation
 }
 
 export interface Dieline {
@@ -31,4 +31,9 @@ export interface Face {
   id: string
   edges: Vertex3D[][]
   dependentFaces: Face[]
+}
+
+export interface Box {
+  vertices: { [id: string]: Vertex3D }
+  faces: { [id: string]: Face }
 }

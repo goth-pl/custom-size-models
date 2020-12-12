@@ -21,12 +21,12 @@ export const box: Dieline = {
     {
       id: 'FRONT',
       edges: [['A', 'B'], ['B', 'E'], ['D', 'E'], ['A', 'D']],
-      rotations: [{ angle: 90, edge: ['D', 'E']}]
+      rotation: { angle: -90, edge: ['D', 'E'] }
     },
     {
       id: 'RIGHT',
       edges: [['C', 'D'], ['D', 'H'], ['G', 'H'], ['C', 'G']],
-      rotations: [{ angle: 90, edge: ['D', 'H']}]
+      rotation: { angle: 90, edge: ['D', 'H'] }
     },
     {
       id: 'BOTTOM',
@@ -35,17 +35,17 @@ export const box: Dieline = {
     {
       id: 'LEFT',
       edges: [['E', 'F'], ['F', 'J'], ['I', 'J'], ['E', 'I']],
-      rotations: [{ angle: 90, edge: ['E', 'I']}]
+      rotation: { angle: -90, edge: ['E', 'I'] }
     },
     {
       id: 'BACK',
       edges: [['H', 'I'], ['I', 'L'], ['K', 'L'], ['H', 'K']],
-      rotations: [{ angle: 90, edge: ['H', 'I']}]
+      rotation: { angle: 90, edge: ['H', 'I'] }
     },
     {
       id: 'TOP',
       edges: [['K', 'L'], ['L', 'N'], ['M', 'N'], ['K', 'M']],
-      rotations: [{ angle: 45, edge: ['K', 'L']}]
+      rotation: { angle: 45, edge: ['K', 'L'] }
     },
   ]
 }

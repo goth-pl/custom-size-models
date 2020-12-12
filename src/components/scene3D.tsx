@@ -9,7 +9,7 @@ import {
   StandardMaterial, Color3, MeshBuilder, DirectionalLight, ArcRotateCamera
 } from "@babylonjs/core"
 import SceneComponent from "babylonjs-hook"
-import { Dieline } from "../types"
+import { Box, Dieline, DielinePart } from "../types"
 import "./scene3D.scss"
 import BoxGenerator from "../services/box-generator"
 
@@ -19,7 +19,8 @@ interface Scene3DProps {
 
 const Scene3D = (props: PropsWithChildren<Scene3DProps>) => {
   const { dieline } = props
-  const box = new BoxGenerator(dieline).call()
+
+  let material: StandardMaterial
 
   const onSceneReady = (scene: Scene) => {
     // This creates and positions a free camera (non-mesh)
@@ -38,16 +39,14 @@ const Scene3D = (props: PropsWithChildren<Scene3DProps>) => {
     // // Our built-in 'ground' shape.
     // MeshBuilder.CreateGround("ground", { width: 6, height: 6 }, scene)
 
-    createBox(scene)
-  }
-
-  const createBox = (scene: Scene) => {
-    const material = new StandardMaterial("material", scene)
+    material = new StandardMaterial("material", scene)
     material.emissiveColor = new Color3(1, 0, 0)
     material.wireframe = true
+  }
 
-    box.getFaces().forEach((face) => {
-      const mesh = new Mesh(face.id, scene)
+  const createBoxMesh = (box: Box, scene: Scene) => {
+    Object.values(box.faces).forEach((face) => {
+      const mesh = scene.getMeshByID(face.id) as Mesh || new Mesh(face.id, scene)
       mesh.material = material
 
       const vertices = [...new Set(face.edges.flat())]
@@ -73,15 +72,30 @@ const Scene3D = (props: PropsWithChildren<Scene3DProps>) => {
     })
   }
 
+  let rotationPercentage = 0
+  let rotationDirection = 1
+
   /**
    * Will run on every frame render.  We are spinning the box on y-axis.
    */
   const onRender = (scene: Scene) => {
-    // if (box !== undefined) {
-    //   var deltaTimeInMillis = scene.getEngine().getDeltaTime();
-    //   const rpm = 10;
-    //   box.rotation.y += ((rpm / 60) * Math.PI * 2 * (deltaTimeInMillis / 1000));
-    // }
+    const dielineCopy = JSON.parse(JSON.stringify(dieline))
+    dielineCopy.parts.forEach((part: DielinePart) => {
+      if (part.rotation) {
+        part.rotation.angle *= Math.min(100, rotationPercentage) / 100
+      }
+    })
+
+    const box = new BoxGenerator(dielineCopy).call()
+    createBoxMesh(box, scene)
+
+    rotationPercentage += rotationDirection
+
+    if (rotationPercentage >= 200) {
+      rotationDirection = -1
+    } else if (rotationPercentage <= 0) {
+      rotationDirection = 1
+    }
   }
 
   return (

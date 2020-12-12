@@ -1,5 +1,5 @@
-import { Dieline, DielinePart, Face, Vertex3D } from "../types"
-import Box from "../models/box"
+import { Dieline, Face, Vertex3D, Box, DielinePart } from "../types"
+import Rotator from './rotator';
 
 class BoxGenerator {
   private vertices: { [id: string]: Vertex3D } = {}
@@ -10,17 +10,39 @@ class BoxGenerator {
   call(): Box {
     this.prepareVertices()
     this.prepareFaces()
+    this.rotateFaces()
 
-    return new Box(this.faces)
+    return {
+      vertices: this.vertices,
+      faces: this.faces
+    }
   }
 
   private prepareVertices() {
+    let Sx = 0
+    let Sy = 0
+    const bottomPart = this.dieline.parts.find((part) => part.id === 'BOTTOM')
+
+    if (bottomPart) {
+      const vertexIds = [...new Set(bottomPart.edges.flat())]
+
+      this.dieline.vertices.forEach((vertex) => {
+        if (vertexIds.includes(vertex.id)) {
+          Sx += vertex.x
+          Sy += vertex.y
+        }
+      })
+
+      Sx /= vertexIds.length
+      Sy /= vertexIds.length
+    }
+
     this.dieline.vertices.forEach((vertex) => {
       this.vertices[vertex.id] = {
         id: vertex.id,
-        x: vertex.x,
+        x: vertex.x - Sx,
         y: 0,
-        z: vertex.y
+        z: vertex.y - Sy
       }
     })
   }
@@ -57,6 +79,35 @@ class BoxGenerator {
 
         this.prepareDependentFaces(dependentFace, face)
       }
+    })
+  }
+
+  private rotateFaces() {
+    this.dieline.parts.forEach((part) => {
+      if (part.rotation) {
+        this.rotateFace(this.faces[part.id], part.rotation.edge, part.rotation.angle)
+      }
+    })
+  }
+
+  private rotateFace(face: Face, edge: string[], angle: number, excludedVertices: Vertex3D[] = []) {
+    const vertices = [...new Set(face.edges.flat())]
+    const verticesToRotate = vertices.filter((vertex) => {
+      return !edge.includes(vertex.id) && !excludedVertices.includes(vertex)
+    })
+
+    verticesToRotate.forEach((vertex) => {
+      const rotator = new Rotator(
+        vertex,
+        edge.map((vertexId) => this.vertices[vertexId]),
+        angle
+      )
+
+      rotator.call()
+    })
+
+    face.dependentFaces.forEach((dependentFace) => {
+      this.rotateFace(dependentFace, edge, angle, verticesToRotate)
     })
   }
 }
